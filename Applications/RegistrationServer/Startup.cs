@@ -9,7 +9,7 @@ using Projects.Data;
 using Steeltoe.CloudFoundry.Connector.MySql.EFCore;
 using Steeltoe.Management.CloudFoundry;
 using Users.Data;
-
+using Steeltoe.Discovery.Client;
 namespace RegistrationServer
 {
     public class Startup
@@ -25,7 +25,7 @@ namespace RegistrationServer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCloudFoundryActuators(Configuration);
-
+            services.AddDiscoveryClient(Configuration);
             services.AddControllers();
 
             services.AddScoped<IAccountDataGateway, AccountDataGateway>();
@@ -47,7 +47,7 @@ namespace RegistrationServer
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseDiscoveryClient();
             app.UseCloudFoundryActuators();
 
             app.UseRouting();

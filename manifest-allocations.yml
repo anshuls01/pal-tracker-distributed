@@ -11,3 +11,4 @@ applications:
       REGISTRATION_SERVER_ENDPOINT: https://registration-pal-as-ap.cfapps.io
     services:
       - tracker-allocations-database
+      - tracker-service-registry

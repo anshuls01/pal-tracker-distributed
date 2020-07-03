@@ -9,7 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Steeltoe.CloudFoundry.Connector.MySql.EFCore;
 using Steeltoe.Management.CloudFoundry;
-
+using Steeltoe.Discovery.Client;
+using Steeltoe.Common.Discovery;
 namespace BacklogServer
 {
     public class Startup
@@ -25,7 +26,7 @@ namespace BacklogServer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCloudFoundryActuators(Configuration);
-
+            services.AddDiscoveryClient(Configuration);
             services.AddControllers();
             
             services.AddDbContext<StoryContext>(options => options.UseMySql(Configuration));
@@ -33,7 +34,8 @@ namespace BacklogServer
 
             services.AddSingleton<IProjectClient>(sp =>
             {
-                var httpClient = new HttpClient
+                var handler = new DiscoveryHttpClientHandler(sp.GetService<IDiscoveryClient>());
+                var httpClient = new HttpClient(handler, false)
                 {
                     BaseAddress = new Uri(Configuration.GetValue<string>("REGISTRATION_SERVER_ENDPOINT"))
                 };
@@ -50,7 +52,7 @@ namespace BacklogServer
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseDiscoveryClient();
             app.UseCloudFoundryActuators();
 
             app.UseRouting();
